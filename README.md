@@ -27,3 +27,10 @@ Descripción breve de las funcionalidades principales.
 2. `Dev Containers: Reopen in Container`
 3. Esperar a que termine `postCreateCommand`
 4. Abrir `http://localhost` en el navegador
+
+## Laravel Boost (IA en Cursor)
+Tras el setup del proyecto:
+1. `php artisan boost:install` — genera `.cursor/mcp.json`, guidelines y skills
+2. En Cursor: `Cmd/Ctrl+Shift+P` → "MCP Settings" → activar `laravel-boost`
+
+Con DevContainer, `.devcontainer/post-create.sh` ejecuta `boost:install` con `REMOTE_CONTAINERS=true` y `"sail": false`, porque dentro del contenedor los comandos van sin `vendor/bin/sail`.

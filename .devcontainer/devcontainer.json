@@ -18,11 +18,14 @@
 		}
 	},
 	"remoteUser": "sail",
+	"containerEnv": {
+		"REMOTE_CONTAINERS": "true"
+	},
 	"forwardPorts": [
 		80,
 		3306
 	],
-	"postCreateCommand": "bash -lc 'cp -n .env.example .env 2>/dev/null || true; php artisan key:generate --force --no-interaction 2>/dev/null || true; composer install --no-interaction; php artisan migrate --force --no-interaction 2>/dev/null || true'",
+	"postCreateCommand": "bash .devcontainer/post-create.sh",
 	"runServices": [
 		"my-balance-app",
 		"mysql"
