@@ -1,0 +1,30 @@
+// https://aka.ms/devcontainer.json
+{
+	"name": "Existing Docker Compose (Extend)",
+	"dockerComposeFile": [
+		"../compose.yaml"
+	],
+	"service": "my-balance-app",
+	"workspaceFolder": "/var/www/html",
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"laravel.vscode-laravel",
+				"amiralizadeh9480.laravel-extra-intellisense",
+				"open-southeners.laravel-pint",
+				"bmewburn.vscode-intelephense-client"
+			],
+			"settings": {}
+		}
+	},
+	"remoteUser": "sail",
+	"forwardPorts": [
+		80,
+		3306
+	],
+	"postCreateCommand": "bash -lc 'cp -n .env.example .env 2>/dev/null || true; php artisan key:generate --force --no-interaction 2>/dev/null || true; composer install --no-interaction; php artisan migrate --force --no-interaction 2>/dev/null || true'",
+	"runServices": [
+		"my-balance-app",
+		"mysql"
+	]
+}
