@@ -1,13 +1,22 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "laravel/laravel",
+    "name": "jonathanizecson/my-balance-app",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
+    "description": "Aplicación personal para gestionar balances financieros.",
     "keywords": [
         "laravel",
-        "framework"
+        "framework",
+        "my-balance-app"
     ],
-    "license": "MIT",
+    "license": "proprietary",
+    "authors": [
+        {
+            "name": "Jonathan Escobedo",
+            "email": "jonathanemmanuel.2292@gmail.com",
+            "homepage": "https://github.com/JonathanIzecson",
+            "role": "Developer"
+        }
+    ],
     "require": {
         "php": "^8.3",
         "laravel/framework": "^13.8",
