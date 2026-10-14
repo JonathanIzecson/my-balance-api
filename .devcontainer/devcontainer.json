@@ -12,7 +12,8 @@
 				"laravel.vscode-laravel",
 				"amiralizadeh9480.laravel-extra-intellisense",
 				"open-southeners.laravel-pint",
-				"bmewburn.vscode-intelephense-client"
+				"bmewburn.vscode-intelephense-client",
+				"sonarsource.sonarlint-vscode"
 			],
 			"settings": {}
 		}
