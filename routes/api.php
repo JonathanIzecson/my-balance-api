@@ -1,8 +1,10 @@
 <?php
 
+use App\Http\Controllers\AccountController;
 use App\Http\Controllers\Api\Auth\LoginController;
 use App\Http\Controllers\Api\Auth\LogoutController;
 use App\Http\Controllers\Api\Auth\RegisterController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\IncomeController;
 use App\Http\Resources\UserResource;
@@ -22,6 +24,10 @@ Route::middleware('auth:sanctum')->post('/logout', LogoutController::class);
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return new UserResource($request->user());
 });
+
+Route::middleware('auth:sanctum')->apiResource('accounts', AccountController::class);
+
+Route::middleware('auth:sanctum')->apiResource('categories', CategoryController::class);
 
 Route::middleware('auth:sanctum')->apiResource('incomes', IncomeController::class);
 
