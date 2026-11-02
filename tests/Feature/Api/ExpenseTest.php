@@ -130,6 +130,22 @@ class ExpenseTest extends TestCase
         $this->assertDatabaseMissing('transactions', ['account_id' => $account->id]);
     }
 
+    public function test_store_rejects_deleted_account(): void
+    {
+        $user = User::factory()->create();
+        $account = Account::create(['name' => 'Efectivo', 'user_id' => $user->id]);
+        $account->delete();
+
+        Sanctum::actingAs($user);
+
+        $this->postJson('/api/expenses', [
+            'description' => 'Renta',
+            'account_id' => $account->id,
+            'amount' => 10,
+            'date' => '2026-10-20',
+        ])->assertUnprocessable()->assertJsonValidationErrors(['account_id']);
+    }
+
     public function test_store_rejects_inactive_account(): void
     {
         $user = User::factory()->create();
@@ -190,6 +206,98 @@ class ExpenseTest extends TestCase
             'account_id' => $account->id,
             'type' => 'expense',
             'amount' => 60,
+        ]);
+    }
+
+    public function test_update_allows_keeping_deleted_account(): void
+    {
+        $user = User::factory()->create();
+        $expense = $this->createExpenseFor($user);
+        Account::withoutGlobalScopes()->findOrFail($expense->account_id)->delete();
+
+        Sanctum::actingAs($user);
+
+        $this->putJson("/api/expenses/{$expense->id}", [
+            'description' => 'Cena',
+            'account_id' => $expense->account_id,
+            'amount' => 30,
+            'date' => '2026-10-21',
+        ])
+            ->assertOk()
+            ->assertJsonPath('data.description', 'Cena')
+            ->assertJsonPath('data.account.id', $expense->account_id);
+
+        $this->assertDatabaseHas('transactions', [
+            'id' => $expense->id,
+            'description' => 'Cena',
+            'account_id' => $expense->account_id,
+        ]);
+    }
+
+    public function test_update_allows_keeping_inactive_account(): void
+    {
+        $user = User::factory()->create();
+        $expense = $this->createExpenseFor($user);
+        Account::withoutGlobalScopes()->findOrFail($expense->account_id)->update(['is_active' => false]);
+
+        Sanctum::actingAs($user);
+
+        $this->putJson("/api/expenses/{$expense->id}", [
+            'description' => 'Cena',
+            'account_id' => $expense->account_id,
+            'amount' => 30,
+            'date' => '2026-10-21',
+        ])
+            ->assertOk()
+            ->assertJsonPath('data.description', 'Cena')
+            ->assertJsonPath('data.account.id', $expense->account_id);
+    }
+
+    public function test_update_rejects_switching_to_deleted_account(): void
+    {
+        $user = User::factory()->create();
+        $expense = $this->createExpenseFor($user);
+        $deleted = Account::create(['name' => 'Archivada', 'user_id' => $user->id]);
+        $deleted->delete();
+
+        Sanctum::actingAs($user);
+
+        $this->putJson("/api/expenses/{$expense->id}", [
+            'description' => 'Cena',
+            'account_id' => $deleted->id,
+            'amount' => 30,
+            'date' => '2026-10-21',
+        ])->assertUnprocessable()->assertJsonValidationErrors(['account_id']);
+
+        $this->assertDatabaseHas('transactions', [
+            'id' => $expense->id,
+            'description' => 'Supermercado',
+            'account_id' => $expense->account_id,
+        ]);
+    }
+
+    public function test_update_rejects_switching_to_inactive_account(): void
+    {
+        $user = User::factory()->create();
+        $expense = $this->createExpenseFor($user);
+        $inactive = Account::create([
+            'name' => 'Cerrada',
+            'user_id' => $user->id,
+            'is_active' => false,
+        ]);
+
+        Sanctum::actingAs($user);
+
+        $this->putJson("/api/expenses/{$expense->id}", [
+            'description' => 'Cena',
+            'account_id' => $inactive->id,
+            'amount' => 30,
+            'date' => '2026-10-21',
+        ])->assertUnprocessable()->assertJsonValidationErrors(['account_id']);
+
+        $this->assertDatabaseHas('transactions', [
+            'id' => $expense->id,
+            'description' => 'Supermercado',
         ]);
     }
 

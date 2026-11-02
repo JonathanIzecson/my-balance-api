@@ -3,10 +3,11 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class ExpenseRequest extends FormRequest
 {
+    use ValidatesTransactionAccount;
+
     public function authorize(): bool
     {
         return true;
@@ -16,10 +17,7 @@ class ExpenseRequest extends FormRequest
     {
         return [
             'description' => ['required', 'string', 'max:255'],
-            'account_id' => [
-                'required',
-                Rule::exists('accounts', 'id')->where('user_id', $this->user()->id)->where('is_active', true),
-            ],
+            'account_id' => ['required', $this->transactionAccountRule()],
             'amount' => ['required', 'numeric', 'min:0.01', 'max:99999999.99'],
             'date' => ['required', 'date'],
         ];
